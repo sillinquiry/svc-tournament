@@ -31,6 +31,24 @@ namespace svc_tournament.Controllers {
                 QuestionId = question.Id,
             }).ToList();
 
+<<<<<<< HEAD
+=======
+            int numberOfRounds = (int)Math.Ceiling(Math.Log(answers.Count, 2));
+            var rounds = new List<RoundData>();
+            for(uint i = 0; i < numberOfRounds; ++i) {
+                uint offset = (uint)(numberOfRounds - i);
+
+                rounds.Add(new RoundData{
+                    Id = Guid.NewGuid(),
+                    Round = offset,
+                    QuestionId = question.Id,
+                    StartDate = DateTime.UtcNow.AddDays(7 * i),
+                    EndDate = DateTime.UtcNow.AddDays(7 * (i+1))
+                });
+            }
+            rounds.Reverse();
+
+>>>>>>> f29c123acdf16bc877a6b421221f958781829d96
             var root = BracketFactory.Convert<AnswerData>(answers);
             
             var matchups = CreateMatchups(root, question);
