@@ -38,12 +38,13 @@ namespace svc_tournament.Controllers {
 
                 rounds.Add(new RoundData{
                     Id = Guid.NewGuid(),
-                    Round = i,
+                    Round = offset,
                     QuestionId = question.Id,
-                    StartDate = DateTime.UtcNow.AddDays(7 * offset),
-                    EndDate = DateTime.UtcNow.AddDays(7 * (offset+1))
+                    StartDate = DateTime.UtcNow.AddDays(7 * i),
+                    EndDate = DateTime.UtcNow.AddDays(7 * (i+1))
                 });
             }
+            rounds.Reverse();
 
             var root = BracketFactory.Convert<AnswerData>(answers);
             
