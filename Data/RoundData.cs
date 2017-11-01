@@ -5,6 +5,7 @@ namespace svc_tournament.Data {
         public Guid Id { get; set; }
         public Guid QuestionId { get; set; }
         public uint Round { get; set; }
-        public String Content { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }
