@@ -10,7 +10,6 @@ namespace svc_tournament.Data {
         }
 
         public DbSet<QuestionData> Questions { get; set; }
-        public DbSet<RoundData> Rounds { get; set; }
         public DbSet<MatchupData> MatchUps { get; set; }
         public DbSet<AnswerData> Answers { get; set; }
     }

@@ -31,26 +31,11 @@ namespace svc_tournament.Controllers {
                 QuestionId = question.Id,
             }).ToList();
 
-            int numberOfRounds = (int)Math.Ceiling(Math.Log(answers.Count, 2));
-            var rounds = new List<RoundData>();
-            for(uint i = 0; i < numberOfRounds; ++i) {
-                uint offset = (uint)(numberOfRounds - i);
-
-                rounds.Add(new RoundData{
-                    Id = Guid.NewGuid(),
-                    Round = i,
-                    QuestionId = question.Id,
-                    StartDate = DateTime.UtcNow.AddDays(7 * offset),
-                    EndDate = DateTime.UtcNow.AddDays(7 * (offset+1))
-                });
-            }
-
             var root = BracketFactory.Convert<AnswerData>(answers);
             
-            var matchups = CreateMatchups(root, rounds);
+            var matchups = CreateMatchups(root, question);
 
             await _dbContext.Questions.AddAsync(question);
-            await _dbContext.Rounds.AddRangeAsync(rounds);
             await _dbContext.MatchUps.AddRangeAsync(matchups);
             await _dbContext.Answers.AddRangeAsync(answers);
             await _dbContext.SaveChangesAsync();
@@ -58,15 +43,12 @@ namespace svc_tournament.Controllers {
             return Ok(new { Question = question.Id } );
         }
 
-        private IEnumerable<MatchupData> CreateMatchups(BracketFactory.Node<AnswerData> root, List<RoundData> rounds) {
+        private IEnumerable<MatchupData> CreateMatchups(BracketFactory.Node<AnswerData> root, QuestionData question) {
             var workspace = new Queue<BracketFactory.Node<AnswerData>>();
             workspace.Enqueue(root);
 
             var results = new List<MatchupData>();
-            var roundIndex = 0;
-            var roundCount = 0;
             
-
             while(workspace.Count > 0) {
                 var node = workspace.Dequeue();
                 if(node.Content == null) {
@@ -75,19 +57,19 @@ namespace svc_tournament.Controllers {
 
                     var matchup = new MatchupData {
                         Id = Guid.NewGuid(),
-                        RoundId = rounds[roundIndex].Id,
                         Answer1Id = node?.Left?.Content?.Id ?? Guid.Empty,
-                        Answer2Id = node?.Right?.Content?.Id ?? Guid.Empty
+                        Answer2Id = node?.Right?.Content?.Id ?? Guid.Empty,
+                        QuestionId = question.Id
                     };
-                    ++roundCount;
-
                     results.Add(matchup);
-
-                    if(Math.Pow(2,roundIndex) <= roundCount) {
-                        roundCount = 0;
-                        ++roundIndex;
-                    }
                 }
+            }
+            
+            results.Reverse();
+
+            for(int i = 0, n = results.Count; i < n; ++i) {
+                results[i].StartDate = DateTime.UtcNow.AddDays(i);
+                results[i].EndDate = DateTime.UtcNow.AddDays(i + 1);
             }
 
             return results;

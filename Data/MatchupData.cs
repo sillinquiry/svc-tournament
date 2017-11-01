@@ -8,5 +8,7 @@ namespace svc_tournament.Data {
         public Guid QuestionId { get; set; }
         public Guid NextMatchupId { get; set; }
         public Guid RoundId { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

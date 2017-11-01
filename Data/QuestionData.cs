@@ -6,5 +6,7 @@ namespace svc_tournament.Data {
         public String Content { get; set; }
         public Guid AskedBy { get; set; }
         public DateTime AskedAt { get; set; }
+        public DateTime ClosedAt { get; set; }
+        public String ClosedReason { get; set; }
     }
 }
